@@ -36,8 +36,7 @@ export const NETWORKS: Record<Network, NetworkConfig> = {
     passphrase: Networks.TESTNET,
     explorer: "https://stellar.expert/explorer/testnet",
     readAccount:
-      process.env.NEXT_PUBLIC_TESTNET_READ_ACCOUNT ||
-      "GBQHBOJHJ3SPU5TYNOABLKIXOZQFMN25ZNALA3QC46Q3I4IN5Q2KXZXI",
+      process.env.NEXT_PUBLIC_TESTNET_READ_ACCOUNT || "GBQHBOJHJ3SPU5TYNOABLKIXOZQFMN25ZNALA3QC46Q3I4IN5Q2KXZXI",
   },
   mainnet: {
     label: "Mainnet",
@@ -48,15 +47,12 @@ export const NETWORKS: Record<Network, NetworkConfig> = {
   },
 };
 
-export const DEFAULT_NETWORK: Network =
-  process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "mainnet" ? "mainnet" : "testnet";
+export const DEFAULT_NETWORK: Network = process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "mainnet" ? "mainnet" : "testnet";
 
-export const explorerTxUrl = (network: Network, hash: string) =>
-  `${NETWORKS[network].explorer}/tx/${hash}`;
+export const explorerTxUrl = (network: Network, hash: string) => `${NETWORKS[network].explorer}/tx/${hash}`;
 export const explorerAccountUrl = (network: Network, account: string) =>
   `${NETWORKS[network].explorer}/account/${account}`;
-export const explorerContractUrl = (network: Network, id: string) =>
-  `${NETWORKS[network].explorer}/contract/${id}`;
+export const explorerContractUrl = (network: Network, id: string) => `${NETWORKS[network].explorer}/contract/${id}`;
 
 const servers = new Map<Network, rpc.Server>();
 
@@ -93,11 +89,7 @@ export function explainError(raw: string, errors: ErrorTable): ContractError {
   const match = /Error\(Contract,\s*#(\d+)\)/.exec(raw);
   if (match) {
     const code = Number(match[1]);
-    return new ContractError(
-      errors[code] ?? `The contract rejected this (error ${code}).`,
-      raw,
-      code,
-    );
+    return new ContractError(errors[code] ?? `The contract rejected this (error ${code}).`, raw, code);
   }
   if (/balance|insufficient|trustline/i.test(raw)) {
     return new ContractError("The account doesn't hold enough of this token.", raw);
@@ -238,11 +230,7 @@ export async function invokeContract(
   return { hash: sent.hash, returnValue };
 }
 
-async function confirm(
-  server: rpc.Server,
-  hash: string,
-  timeoutMs = 60_000,
-): Promise<rpc.Api.GetTransactionResponse> {
+async function confirm(server: rpc.Server, hash: string, timeoutMs = 60_000): Promise<rpc.Api.GetTransactionResponse> {
   const started = Date.now();
   for (;;) {
     const res = await withRetry(() => server.getTransaction(hash));

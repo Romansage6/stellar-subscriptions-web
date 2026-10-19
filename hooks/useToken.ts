@@ -13,8 +13,5 @@ export function useToken(token: string | undefined) {
 /** `owner`'s balance of `token`; idle until both are known. */
 export function useTokenBalance(token: string | undefined, owner: string | null) {
   const { network } = useWallet();
-  return useAsync(
-    token && owner ? () => getTokenBalance(network, token, owner) : null,
-    [network, token, owner],
-  );
+  return useAsync(token && owner ? () => getTokenBalance(network, token, owner) : null, [network, token, owner]);
 }

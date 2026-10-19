@@ -6,10 +6,7 @@ import { PlanBadge } from "./PlanBadge";
 
 export function PlanCard({ plan }: { plan: Plan }) {
   return (
-    <Link
-      href={`/plans/${plan.id}`}
-      className="card group flex flex-col gap-4 p-5 transition hover:border-brand/50"
-    >
+    <Link href={`/plans/${plan.id}`} className="card group flex flex-col gap-4 p-5 transition hover:border-brand/50">
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-semibold text-fg group-hover:text-brand">{plan.name}</h3>
         <PlanBadge active={plan.active} />

@@ -7,19 +7,13 @@ import { getSubscription, getSubscriptionsByMerchant, getSubscriptionsBySubscrib
 /** Subscriptions owned by `subscriber`; idle without a connected account. */
 export function useSubscriptions(subscriber: string | null) {
   const { network } = useWallet();
-  return useAsync(
-    subscriber ? () => getSubscriptionsBySubscriber(network, subscriber) : null,
-    [network, subscriber],
-  );
+  return useAsync(subscriber ? () => getSubscriptionsBySubscriber(network, subscriber) : null, [network, subscriber]);
 }
 
 /** Subscriptions payable to `merchant`; idle without a connected account. */
 export function useMerchantSubscriptions(merchant: string | null) {
   const { network } = useWallet();
-  return useAsync(
-    merchant ? () => getSubscriptionsByMerchant(network, merchant) : null,
-    [network, merchant],
-  );
+  return useAsync(merchant ? () => getSubscriptionsByMerchant(network, merchant) : null, [network, merchant]);
 }
 
 /** One subscription, read fresh from the contract. */

@@ -54,8 +54,8 @@ export function AuthorizationSummary({
           {remainder > 0n && (
             <span className="text-muted">
               {" "}
-              The last {formatAmount(remainder, token.decimals)} {token.symbol} of the cap can never be charged,
-              because every charge is exactly {amount}.
+              The last {formatAmount(remainder, token.decimals)} {token.symbol} of the cap can never be charged, because
+              every charge is exactly {amount}.
             </span>
           )}
         </li>
@@ -74,9 +74,9 @@ export function AuthorizationSummary({
       </ul>
 
       <p className="border-t border-line pt-3 text-xs text-muted">
-        These limits are enforced by the subscription contract, not by this website. Freighter will ask you to
-        approve the contract to spend up to your cap from your {token.symbol} balance — the same limit. Times are
-        estimates: the contract counts ledgers, which close about every 5 seconds.
+        These limits are enforced by the subscription contract, not by this website. Freighter will ask you to approve
+        the contract to spend up to your cap from your {token.symbol} balance — the same limit. Times are estimates: the
+        contract counts ledgers, which close about every 5 seconds.
       </p>
     </section>
   );

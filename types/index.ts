@@ -73,15 +73,7 @@ export interface ChargeEvent {
   txHash: string;
 }
 
-export type TxPhase =
-  | "idle"
-  | "checking"
-  | "building"
-  | "signing"
-  | "submitting"
-  | "confirming"
-  | "success"
-  | "error";
+export type TxPhase = "idle" | "checking" | "building" | "signing" | "submitting" | "confirming" | "success" | "error";
 
 export interface TxResult {
   hash: string;

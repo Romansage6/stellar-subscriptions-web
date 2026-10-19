@@ -51,21 +51,31 @@ export function CancelButton({ sub, onDone }: { sub: Subscription; onDone: () =>
   }
 
   return (
-    <div role="alertdialog" aria-labelledby={`cancel-${sub.id}`} className="w-full space-y-3 rounded-lg border border-danger/40 bg-danger/5 p-4">
+    <div
+      role="alertdialog"
+      aria-labelledby={`cancel-${sub.id}`}
+      className="w-full space-y-3 rounded-lg border border-danger/40 bg-danger/5 p-4"
+    >
       <h4 id={`cancel-${sub.id}`} className="font-semibold text-fg">
         Cancel subscription #{sub.id}?
       </h4>
       <p className="text-sm text-fg">
-        <strong>After you cancel, no further charges can occur.</strong> Not now, not later, not by the merchant,
-        not by anyone. This is final and can&apos;t be undone — to subscribe again you would start a new
-        subscription.
+        <strong>After you cancel, no further charges can occur.</strong> Not now, not later, not by the merchant, not by
+        anyone. This is final and can&apos;t be undone — to subscribe again you would start a new subscription.
       </p>
       <p className="text-sm text-muted">
         You&apos;ve been charged <TokenAmount token={sub.token} value={sub.totalCharged} /> so far. Cancelling
         doesn&apos;t refund that, and costs a small network fee.
       </p>
 
-      <TxProgress phase={tx.phase} hash={tx.hash} error={tx.error} network={network} successText="" onDismiss={tx.reset} />
+      <TxProgress
+        phase={tx.phase}
+        hash={tx.hash}
+        error={tx.error}
+        network={network}
+        successText=""
+        onDismiss={tx.reset}
+      />
 
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-danger" onClick={() => void cancel()} disabled={tx.pending}>
