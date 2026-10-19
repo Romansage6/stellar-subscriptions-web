@@ -8,6 +8,7 @@ import {
   decodeSubscription,
   toNumber,
 } from "./contracts";
+import { scValToNative, xdr } from "@stellar/stellar-sdk";
 import { SubStatus } from "@/types";
 
 describe("event paging", () => {
@@ -91,6 +92,71 @@ describe("decoders", () => {
 
   it("refuses ids too large to represent exactly", () => {
     expect(() => toNumber(2n ** 60n)).toThrow(/too large/);
+  });
+});
+
+// Return values of the read functions as base64 `ScVal` XDR, the form the RPC
+// hands back in simulation results. Decoding goes through the real
+// `scValToNative`, so a renamed contract field no longer decodes.
+const SUBSCRIPTION_XDR =
+  "AAAAEQAAAAEAAAANAAAADwAAABFhbW91bnRfcGVyX3BlcmlvZAAAAAAAAAoAAAAAAAAAAAAAAAAAmJaAAAAADwAAAAJpZAAAAAAABQAAAAAAAAABAAAADwAAABBpbnRlcnZhbF9sZWRnZXJzAAAAAwAAAtAAAAAPAAAAEmxhc3RfY2hhcmdlX2xlZGdlcgAAAAAAAwBHnAIAAAAPAAAACG1lcmNoYW50AAAAEgAAAAAAAAAAlgX2hS8+yf0sSeUuBtdjFJlM2Ce0dPb/+3naKWX4UDUAAAAPAAAAEm5leHRfY2hhcmdlX2xlZGdlcgAAAAAAAwBHntIAAAAPAAAAB3BsYW5faWQAAAAABQAAAAAAAAABAAAADwAAAAxzdGFydF9sZWRnZXIAAAADAEecAAAAAA8AAAAGc3RhdHVzAAAAAAADAAAAAAAAAA8AAAAKc3Vic2NyaWJlcgAAAAAAEgAAAAAAAAAAVAqXPTCyxiK7yrK+0kouJ9GEOZ44/tep/0DT2nf5gSIAAAAPAAAABXRva2VuAAAAAAAAEgAAAAHXkotywnA8z+r365/0701QSlWouXn8m0UOoshCtNHOYQAAAA8AAAAJdG90YWxfY2FwAAAAAAAACgAAAAAAAAAAAAAAAAcnDgAAAAAPAAAADXRvdGFsX2NoYXJnZWQAAAAAAAAKAAAAAAAAAAAAAAAAAJiWgA==";
+const PLAN_XDR =
+  "AAAAEQAAAAEAAAAJAAAADwAAAAZhY3RpdmUAAAAAAAAAAAABAAAADwAAABFhbW91bnRfcGVyX3BlcmlvZAAAAAAAAAoAAAAAAAAAAAAAAAAAmJaAAAAADwAAAApjcmVhdGVkX2F0AAAAAAADAEeb/gAAAA8AAAALZGVmYXVsdF9jYXAAAAAACgAAAAAAAAAAAAAAAAcnDgAAAAAPAAAAAmlkAAAAAAAFAAAAAAAAAAMAAAAPAAAAEGludGVydmFsX2xlZGdlcnMAAAADAAAC0AAAAA8AAAAIbWVyY2hhbnQAAAASAAAAAAAAAACWBfaFLz7J/SxJ5S4G12MUmUzYJ7R09v/7edopZfhQNQAAAA8AAAAEbmFtZQAAAA4AAAALRGVtbyBob3VybHkAAAAADwAAAAV0b2tlbgAAAAAAABIAAAAB15KLcsJwPM/q9+uf9O9NUEpVqLl5/JtFDqLIQrTRzmE=";
+const STATS_XDR =
+  "AAAAEQAAAAEAAAAEAAAADwAAABRhY3RpdmVfc3Vic2NyaXB0aW9ucwAAAAUAAAAAAAAAAQAAAA8AAAAUdG90YWxfY2hhcmdlZF92b2x1bWUAAAAKAAAAAAAAAAAAAAAAAJiWgAAAAA8AAAALdG90YWxfcGxhbnMAAAAABQAAAAAAAAABAAAADwAAABN0b3RhbF9zdWJzY3JpcHRpb25zAAAAAAUAAAAAAAAAAg==";
+
+function fixture(b64: string): Record<string, unknown> {
+  return scValToNative(xdr.ScVal.fromXDR(b64, "base64")) as Record<string, unknown>;
+}
+
+describe("decoder fixtures", () => {
+  it("decodes a subscription fixture", () => {
+    expect(decodeSubscription(fixture(SUBSCRIPTION_XDR))).toEqual({
+      id: 1,
+      subscriber: SUBSCRIBER,
+      merchant: MERCHANT,
+      token: XLM,
+      amountPerPeriod: 10_000_000n,
+      intervalLedgers: 720,
+      totalCap: 120_000_000n,
+      totalCharged: 10_000_000n,
+      startLedger: 4_692_992,
+      lastChargeLedger: 4_692_994,
+      nextChargeLedger: 4_693_714,
+      status: SubStatus.Active,
+      planId: 1,
+    });
+  });
+
+  it("decodes a plan fixture", () => {
+    expect(decodePlan(fixture(PLAN_XDR))).toEqual({
+      id: 3,
+      merchant: MERCHANT,
+      name: "Demo hourly",
+      token: XLM,
+      amountPerPeriod: 10_000_000n,
+      intervalLedgers: 720,
+      defaultCap: 120_000_000n,
+      active: true,
+      createdAt: 4_692_990,
+    });
+  });
+
+  it("decodes a registry stats fixture", () => {
+    expect(decodeStats(fixture(STATS_XDR))).toEqual({
+      totalPlans: 1,
+      totalSubscriptions: 2,
+      activeSubscriptions: 1,
+      totalChargedVolume: 10_000_000n,
+    });
+  });
+
+  it("fails when a contract field is renamed", () => {
+    const sub = fixture(SUBSCRIPTION_XDR);
+    const { total_cap: cap, ...rest } = sub;
+    expect(() => decodeSubscription({ ...rest, cap_total: cap })).toThrow();
+    const { total_plans: plans, ...stats } = fixture(STATS_XDR);
+    expect(() => decodeStats({ ...stats, plan_count: plans })).toThrow();
   });
 });
 
