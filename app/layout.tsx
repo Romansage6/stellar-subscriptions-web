@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { NetworkNotice } from "@/components/layout/NetworkNotice";
@@ -22,10 +23,12 @@ export const viewport: Viewport = {
 const THEME_SCRIPT = `try{if(localStorage.getItem("subs.theme")==="light")document.documentElement.classList.remove("dark")}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  // Set per request by middleware.ts; allows this inline script under the CSP.
+  const nonce = headers().get("x-nonce") ?? undefined;
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
         <WalletProvider>
