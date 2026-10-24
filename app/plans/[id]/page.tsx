@@ -88,7 +88,11 @@ export default function PlanDetailPage({ params }: { params: { id: string } }) {
 
         <aside className="space-y-4">
           <h2 className="text-lg font-semibold text-fg">Subscribe</h2>
-          {token.error ? (
+          {!p.active ? (
+            <div className="card p-5 text-sm text-muted">
+              This plan is closed to new subscribers. Anyone already subscribed keeps exactly the terms they authorized.
+            </div>
+          ) : token.error ? (
             <ErrorState error={token.error} title="Couldn't read this plan's token" onRetry={token.reload} />
           ) : token.data ? (
             <SubscribeForm plan={p} token={token.data} />
