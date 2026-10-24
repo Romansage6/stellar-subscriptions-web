@@ -8,9 +8,12 @@ next-env.d.ts
 
 # production
 /build
+/storybook-static
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 
 # env files
 .env
